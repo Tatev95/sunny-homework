@@ -1,0 +1,17 @@
+.login_form{
+    display: flex;
+    justify-content: space-between;
+    width: 500px;
+    flex-wrap: wrap;
+}
+
+.input_field{
+    margin: 10px;
+    width: 300px;
+}
+
+.login_button{
+    margin: 10px;
+    width: 100px;
+    cursor: pointer;
+}

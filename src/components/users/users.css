@@ -1,0 +1,38 @@
+.user_td {
+    width: 100px;
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    height: 20px; 
+    background-color: rgb(219, 235, 248);
+  }
+
+  .user_td:nth-child(1) {
+    width: 20px;
+    }
+
+  .delete_td, .edit_td{
+    width: 30px;
+    border: .5px solid rgb(192, 186, 186);
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .delete_td{
+    background-color: red;
+    color: white;
+  }
+
+  .edit_td{
+    background-color: rgb(83, 207, 83);
+    color: white;
+  }
+
+  .add_users{
+    cursor: pointer;
+  }
+.empty_table{
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(197, 31, 31);
+}

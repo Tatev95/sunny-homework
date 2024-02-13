@@ -1,0 +1,52 @@
+.add_popup{
+    position: absolute;
+    width: 400px;
+    background-color: rgb(212, 212, 228);
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    color: brown;
+    padding: 20px;
+    left: 30%;
+}
+
+.add_name{
+    margin: 20px;
+}
+
+.add_age {
+    margin: 0 20px 20px 20px;
+}
+
+.add_age, .add_name{
+    width: 350px;
+    border-radius: 8px;
+    border: none;
+    height: 25px;
+    padding: 8px;
+}
+
+.add_button{
+    width: 350px;
+    background-color: rgb(32, 194, 153);
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.add_header{ 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 360px;
+    margin-left: 20px;
+}
+
+.close_popup{
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+}
