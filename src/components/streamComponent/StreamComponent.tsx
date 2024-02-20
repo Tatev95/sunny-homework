@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { deviceProvider } from "../../providers/device-provider";
+import { dbProvider } from "../../providers/db-provider";
 
 export const StreamComponent: FC = () => {
-
   const [devices, setDevices] = useState(deviceProvider.devices);
   const [stop, setStop] = useState(false);
-  const [deviceId, setDeviceId] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
+  const [deviceId, setDeviceId] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -34,30 +34,41 @@ export const StreamComponent: FC = () => {
     };
   }, [deviceId, deviceProvider]);
 
-  const startRecording = () => {
+  const startRecording = async () => {
     if (deviceProvider.mediaStream) {
-      mediaRecorderRef.current = new MediaRecorder(deviceProvider.mediaStream);
+      await dbProvider.openDB();
 
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunksRef.current.push(event.data);
-        }
+      mediaRecorderRef.current = new MediaRecorder(deviceProvider.mediaStream, {
+        mimeType: "video/webm",
+      });
+
+      mediaRecorderRef.current.ondataavailable = async (event) => {
+        recordedChunksRef.current.push(event.data);
+
+        await dbProvider.addItem(event.data);
       };
 
       mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
-        const videoUrl = URL.createObjectURL(blob);
-        console.log("Recorded video URL:", videoUrl);
-        setVideoUrl(videoUrl)
+        console.log("Recording stopped");
+        const recordings = recordedChunksRef.current;
+        recordedChunksRef.current = [];
+
+        const blob = new Blob(recordings, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        setVideoUrl(url);
       };
 
       mediaRecorderRef.current.start();
     }
+
     setStop(true);
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === "recording"
+    ) {
       mediaRecorderRef.current.stop();
     }
     setStop(false);
@@ -73,7 +84,17 @@ export const StreamComponent: FC = () => {
         startRecording();
       }
     }
+  };
 
+  const downloadVideo = async () => {
+    if (videoUrl) {
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.download = "recorded-video.webm";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   return (
@@ -84,7 +105,12 @@ export const StreamComponent: FC = () => {
           <div
             key={device.deviceId}
             onClick={() => handleChangeDevice(device.deviceId)}
-            style={{ cursor: "pointer", padding: "5px", backgroundColor: deviceId === device.deviceId ? "lightblue" : "inherit" }}
+            style={{
+              cursor: "pointer",
+              padding: "5px",
+              backgroundColor:
+                deviceId === device.deviceId ? "lightblue" : "inherit",
+            }}
           >
             {device.label}
           </div>
@@ -95,13 +121,32 @@ export const StreamComponent: FC = () => {
       <video ref={videoRef} autoPlay playsInline />
       <button
         onClick={stop ? stopRecording : startRecording}
-        style={{ cursor: "pointer", padding: "10px", backgroundColor: "lightgrey", border: "none", borderRadius: "10px" }}
+        style={{
+          cursor: "pointer",
+          padding: "10px",
+          backgroundColor: "lightgrey",
+          border: "none",
+          borderRadius: "10px",
+        }}
       >
         {stop ? "Stop" : "Start Recording"}
-
       </button>
       {!stop && (
-        <h4>Video URL:  {videoUrl}</h4>
+        <>
+          <h4>Video URL: {videoUrl}</h4>
+          <button
+            onClick={downloadVideo}
+            style={{
+              cursor: "pointer",
+              padding: "10px",
+              backgroundColor: "lightgreen",
+              border: "none",
+              borderRadius: "10px",
+            }}
+          >
+            Download Recorded Video
+          </button>
+        </>
       )}
     </div>
   );

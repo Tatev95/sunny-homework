@@ -37,7 +37,9 @@ class DeviceProvider {
 
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
         video: selectedCamera ? { deviceId: selectedCamera.deviceId } : true,
-        audio: selectedMicrophone ? { deviceId: selectedMicrophone.deviceId } : true,
+        audio: selectedMicrophone
+          ? { deviceId: selectedMicrophone.deviceId }
+          : true,
       });
 
       return this.mediaStream;
